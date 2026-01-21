@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Molaritas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #8dff0b 0%, #96bcff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 2.2em;
+            background: linear-gradient(90deg, #96bcff, #8dff0b);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .formula-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-left: 5px solid #96bcff;
+            font-size: 1.2em;
+            color: #2c3e50;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .formula-display span {
+            font-weight: bold;
+            color: #96bcff;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #96bcff;
+            box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.1);
+        }
+
+        .unit-label {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(90deg, #96bcff, #8dff0b);
+            color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(37, 117, 252, 0.3);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            border-top: 5px solid #96bcff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-value {
+            font-size: 3em;
+            font-weight: 700;
+            text-align: center;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+
+        .result-unit {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .result-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-detail {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-detail span {
+            display: block;
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .result-detail strong {
+            color: #96bcff;
+            font-size: 1.1em;
+        }
+
+        .concentration-scale {
+            height: 8px;
+            background: linear-gradient(90deg, #4CAF50, #FFC107, #F44336);
+            border-radius: 4px;
+            margin: 20px 0 10px;
+            position: relative;
+        }
+
+        .scale-marker {
+            position: absolute;
+            top: -5px;
+            width: 2px;
+            height: 18px;
+            background: #2c3e50;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: bold;
+            color: #96bcff;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #96bcff;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .history-item {
+            background: white;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #96bcff;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Kalkulator molaritas Ar</h1>
+        
+        <div class="formula-display">
+            Molarity (M) = <span>moles of solute</span> / <span>liters of solution</span>
+        </div>
+
+        <div class="input-group">
+            <label for="mass">Mass of Solute (g)</label>
+            <input type="number" id="mass" step="0.001" placeholder="Enter mass in grams">
+            <span class="unit-label">g</span>
+        </div>
+
+        <div class="input-group">
+            <label for="molarMass">Molar Mass (g/mol)</label>
+            <input type="number" id="molarMass" step="0.01" placeholder="Enter molar mass">
+            <span class="unit-label">g/mol</span>
+        </div>
+
+        <div class="input-group">
+            <label for="volume">Volume of Solution (L)</label>
+            <div class="slider-container">
+                <div class="slider-value" id="volumeValue">1.00 L</div>
+                <input type="range" id="volume" min="0.1" max="10" step="0.1" value="1">
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateMolarity()">
+            Calculate Molarity
+        </button>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-value" id="resultValue">0.000</div>
+            <div class="result-unit">Moles per Liter (mol/L)</div>
+            
+            <div class="concentration-scale">
+                <div class="scale-marker" id="scaleMarker" style="left: 0%"></div>
+            </div>
+            <div class="scale-labels">
+                <span>Dilute</span>
+                <span>Moderate</span>
+                <span>Concentrated</span>
+            </div>
+
+            <div class="result-details">
+                <div class="result-detail">
+                    <span>Moles of Solute</span>
+                    <strong id="molesValue">0.000 mol</strong>
+                </div>
+                <div class="result-detail">
+                    <span>Concentration</span>
+                    <strong id="concentrationType">-</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const volumeSlider = document.getElementById('volume');
+        const volumeValue = document.getElementById('volumeValue');
+        const scaleMarker = document.getElementById('scaleMarker');
+
+        volumeSlider.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            volumeValue.textContent = value.toFixed(2) + ' L';
+        });
+
+        function calculateMolarity() {
+            const mass = parseFloat(document.getElementById('mass').value);
+            const molarMass = parseFloat(document.getElementById('molarMass').value);
+            const volume = parseFloat(volumeSlider.value);
+
+            if (!mass || !molarMass || !volume || mass <= 0 || molarMass <= 0 || volume <= 0) {
+                alert('Please enter valid positive numbers for all fields');
+                return;
+            }
+
+            // Calculate moles
+            const moles = mass / molarMass;
+            
+            // Calculate molarity
+            const molarity = moles / volume;
+
+            // Update results
+            document.getElementById('resultValue').textContent = molarity.toFixed(4);
+            document.getElementById('molesValue').textContent = moles.toFixed(4) + ' mol';
+            
+            // Determine concentration type
+            let concentrationType = 'Dilute';
+            if (molarity > 0.1 && molarity <= 1) {
+                concentrationType = 'Moderate';
+            } else if (molarity > 1) {
+                concentrationType = 'Concentrated';
+            }
+            document.getElementById('concentrationType').textContent = concentrationType;
+
+            // Update scale marker position
+            const markerPosition = Math.min(Math.log10(molarity + 1) * 50, 100);
+            scaleMarker.style.left = markerPosition + '%';
+
+            // Show result container with animation
+            const resultContainer = document.getElementById('resultContainer');
+            resultContainer.style.display = 'block';
+            
+            // Add to history
+            addToHistory(mass, molarMass, volume, molarity);
+        }
+
+        function addToHistory(mass, molarMass, volume, molarity) {
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div style="font-weight: bold; color: #2575fc;">M = ${molarity.toFixed(4)} M</div>
+                <div style="font-size: 0.9em; color: #666;">
+                    Mass: ${mass}g | MM: ${molarMass}g/mol | Vol: ${volume}L
+                </div>
+            `;
+            
+            // Insert at beginning of calculator container
+            const container = document.querySelector('.calculator-container');
+            container.insertBefore(historyItem, container.children[container.children.length - 1]);
+        }
+
+        // Allow Enter key to trigger calculation
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateMolarity();
+            }
+        });
+
+        // Initialize with example values
+    </script>
+</body>
+</html>
